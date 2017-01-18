@@ -32,6 +32,7 @@ namespace Vidly.Controllers
             var membershipTypes = context.MembershipTypes.ToList();
             var viewModel = new CustomerFormViewModel()
             {
+                Customer = new Customer(),
                 MembershipTypes = membershipTypes
             };
 
@@ -41,6 +42,15 @@ namespace Vidly.Controllers
         [HttpPost]
         public ActionResult Save(Customer customer)
         {
+            if (!ModelState.IsValid)
+            {
+                var viewModel = new CustomerFormViewModel()
+                {
+                    Customer = customer,
+                    MembershipTypes = context.MembershipTypes
+                };
+                return View("CustomerForm", viewModel);
+            }
             if (customer.Id == 0)
             {
                 context.Customers.Add(customer);
@@ -51,8 +61,8 @@ namespace Vidly.Controllers
                 customerInDb.Name = customer.Name;
                 customerInDb.Birthday = customer.Birthday;
                 customerInDb.MembershipTypeId = customer.MembershipTypeId;
-                customerInDb.Name = customer.Name;
-                //TODO map other properties
+                customerInDb.MembershipType = customer.MembershipType;
+                customerInDb.IsSubscribedToNewsLetter = customerInDb.IsSubscribedToNewsLetter;
 
             }
             context.SaveChanges();
